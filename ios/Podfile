@@ -12,6 +12,8 @@ target 'originBook' do
     :hermes_enabled => false
   )
 
+  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-community/async-storage'
+
   target 'originBookTests' do
     inherit! :complete
     # Pods for testing

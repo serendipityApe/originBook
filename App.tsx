@@ -9,8 +9,13 @@
  */
 
 import React from 'react';
+import {Provider} from 'react-redux';
+import {persistStore} from 'redux-persist';
+import {PersistGate} from 'redux-persist/es/integration/react';
+import {store, persistor} from './src/redux/store';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+
 import {
   Text,
   HStack,
@@ -35,10 +40,11 @@ import {
 import {PermissionsAndroid} from 'react-native';
 import {WebView} from 'react-native-webview';
 
+import Home from './src/views/home';
 import BlankBook from './src/components/blankBook';
 import Search from './src/components/search';
 import Book from './src/components/book';
-import ReadBook from './src/views/readBook'
+import ReadBook from './src/views/readBook';
 // Color Switch Component
 function ToggleDarkMode() {
   const {colorMode, toggleColorMode} = useColorMode();
@@ -57,48 +63,6 @@ function ToggleDarkMode() {
   );
 }
 const Stack = createNativeStackNavigator();
-function Home({navigation}) {
-  return (
-    <Center
-      _dark={{bg: 'blueGray.900'}}
-      _light={{bg: 'blueGray.50'}}
-      px={4}
-      flex={1}>
-      <StatusBar
-        animated={true}
-        // translucent={true}
-        barStyle="dark-content"
-        backgroundColor={'#f8fafc'}
-      />
-      <Search />
-      <ScrollView position="relative" maxHeight="80%">
-        <Flex
-          direction="row"
-          flexWrap="wrap"
-          // alignItems="center"
-          justifyContent="space-between"
-          position="relative">
-          <Book />
-          <Book />
-          <Book />
-          <Book />
-          <BlankBook />
-          <Button onPress={() => navigation.push('Details')}>
-            go to details
-          </Button>
-          <Box
-            flexBasis="30%"
-            flexShrink="0"
-            flexGrow="0"
-            width="0"
-            height="0"
-          />
-          {/* <ToggleDarkMode /> */}
-        </Flex>
-      </ScrollView>
-    </Center>
-  );
-}
 
 const App = () => {
   async function permissions() {
@@ -161,15 +125,19 @@ const App = () => {
   return (
     <NavigationContainer>
       <NativeBaseProvider>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen
-            name="Home"
-            //隐藏header bar
-            options={{headerShown: false}}
-            component={Home}
-          />
-          <Stack.Screen name="Details" component={ReadBook} />
-        </Stack.Navigator>
+        <Provider store={store}>
+          <PersistGate persistor={persistor}>
+            <Stack.Navigator initialRouteName="Home">
+              <Stack.Screen
+                name="Home"
+                //隐藏header bar
+                options={{headerShown: false}}
+                component={Home}
+              />
+              <Stack.Screen name="Details" component={ReadBook} />
+            </Stack.Navigator>
+          </PersistGate>
+        </Provider>
       </NativeBaseProvider>
     </NavigationContainer>
   );
