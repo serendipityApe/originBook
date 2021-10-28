@@ -16,7 +16,11 @@ import BlankBook from '../components/blankBook';
 import Search from '../components/search';
 import Book from '../components/book';
 function Home({navigation}) {
-  const books = store.getState().bookshelf.contents;
+  // const books = store.getState().bookshelf.contents;
+  const [books, setBooks] = React.useState(store.getState().bookshelf.contents);
+  store.subscribe(() => {
+    setBooks(store.getState().bookshelf.contents);
+  });
   return (
     <Center
       _dark={{bg: 'blueGray.900'}}
@@ -37,20 +41,15 @@ function Home({navigation}) {
           // alignItems="center"
           justifyContent="space-between"
           position="relative">
-          {(() => {
-            for (
-              let i = 0;
-              i < store.getState().bookshelf.contents.length;
-              i++
-            ) {
-              return (
-                <Book
-                  name={store.getState().bookshelf.contents[i].name}
-                  pUri={store.getState().bookshelf.contents[i].pUri}
-                />
-              );
-            }
-          })()}
+          {books.map(element => {
+            return (
+              <Book
+                name={element.name}
+                key={element.name}
+                pUri={element.pUri}
+              />
+            );
+          })}
           <Book name="test" pUri="" />
           <Book name="test" pUri="" />
           <Book name="test" pUri="" />
@@ -59,7 +58,7 @@ function Home({navigation}) {
           <Button onPress={() => navigation.push('Details')}>go</Button>
           <Button
             onPress={() => {
-              console.log(store.getState().bookshelf.contents);
+              console.log(store.getState().bookshelf);
             }}>
             store
           </Button>

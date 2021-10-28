@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View, ScrollView, Modal, Button} from 'native-base';
+import {Text, View, Modal, Button, Box} from 'native-base';
 import {WebView} from 'react-native-webview';
 import RNFS from 'react-native-fs';
 
@@ -8,8 +8,9 @@ import {set_shelf} from '../redux/actions/bookshelf';
 //引入connect用于连接UI组件与redux
 import {connect} from 'react-redux';
 import {StoreState} from '../types/store';
-
-function PureBook(props) {
+import {store} from '../redux/store';
+import Read from './read';
+function PureBook(props: any) {
   async function myMkdir(path: string) {
     try {
       let isExists = await RNFS.exists(path);
@@ -46,6 +47,20 @@ function PureBook(props) {
     res.push(contents.slice(index + 1));
     return res;
   }
+  //将不存在的书加入书架
+  function addBookshelf(name: string) {
+    let books = store.getState().bookshelf.contents;
+    let flag = true;
+    for (let item of books) {
+      if (item.name === name) {
+        flag = false;
+        break;
+      }
+    }
+    if (flag) {
+      props.set_shelf({name, pUri: '', preChapter: 0});
+    }
+  }
   const jsCode = `
     window.test = function(){
       let lists=document.querySelectorAll('.centent li a');
@@ -58,33 +73,33 @@ function PureBook(props) {
     }
     `;
   const [uri, setUri] = React.useState('https://www.ptwxz.com/html/8/8927/');
-  const [msg, setMsg] = React.useState('');
+  const [name, setName] = React.useState('');
   const [purify, setPurify] = React.useState(false);
   const [showModal, setShowModal] = React.useState(false);
   const web = React.useRef<WebView>(null);
   return (
     <View>
-      <View
-        style={
-          purify
-            ? {height: 0, width: 0, display: 'none'}
-            : {height: '100%', width: '100%', overflow: 'hidden'}
-        }>
-        <WebView
-          startInLoadingState={true}
-          ref={web}
-          source={{uri}}
-          injectedJavaScript={jsCode}
-          onMessage={event => {
-            setMsg(event.nativeEvent.data);
-            let res = analysis(event.nativeEvent.data);
-            write(res[0], 'a', res[1], 'utf8');
-          }}
-          onLoadEnd={() => {
-            setShowModal(true);
-            props.set_shelf({name: 'test2', pUri: ''});
-          }}
-        />
+      <View style={{height: '100%', width: '100%', overflow: 'hidden'}}>
+        {purify ? (
+          <Read name={name} />
+        ) : (
+          <WebView
+            startInLoadingState={true}
+            ref={web}
+            source={{uri}}
+            injectedJavaScript={jsCode}
+            onMessage={event => {
+              let res = analysis(event.nativeEvent.data);
+              setName(res[0]);
+              write(res[0], 'a', res[1], 'utf8');
+              addBookshelf(res[0]);
+              setPurify(true);
+            }}
+            onLoadEnd={() => {
+              setShowModal(true);
+            }}
+          />
+        )}
       </View>
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} size="lg">
         <Modal.Content maxWidth="350">
@@ -98,7 +113,6 @@ function PureBook(props) {
               flex="1"
               onPress={() => {
                 web && web.current!.injectJavaScript('window.test()');
-                setPurify(true);
                 setShowModal(false);
               }}>
               净化

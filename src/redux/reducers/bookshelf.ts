@@ -6,19 +6,22 @@ import {SET_SHELF} from '../constants';
 import {StoreBookshelf} from '../../types/store';
 import {All} from '../actions/bookshelf';
 
-const initState: StoreBookshelf = {contents: [{name: '默认', pUri: ''}]}; //初始化状态
-export default function ipReducer(
+const initState: StoreBookshelf = {
+  contents: [{name: '默认', pUri: '', preChapter: 0}],
+}; //初始化状态
+export default function bookshelfReducer(
   preState: StoreBookshelf = initState,
   action: All,
 ): StoreBookshelf {
-  // console.log('countReducer@#@#@#');
   //从action对象中获取：type、data
   const {type, data} = action;
   //根据type决定如何加工数据
   switch (type) {
     case SET_SHELF:
-      preState.contents.push(data);
-      return preState;
+      console.log(data);
+      // preState.contents.push(data); 不能直接修改preState...只有preState和curState不同才提交修改
+      return {contents: [...preState.contents, data]};
+    // return { contents: [{ name: '默认', pUri: '', preChapter: 0 }] };
     default:
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const exhaustiveCheck: never = type; //走default时会报错   类型“xxx”的参数不能赋给类型“never”的参数。来确保actions的类型正确
