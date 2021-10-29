@@ -1,5 +1,5 @@
 import React from 'react';
-import {Text, View, Modal, Button} from 'native-base';
+import {Text, View} from 'native-base';
 import {WebView} from 'react-native-webview';
 import RNFS from 'react-native-fs';
 
@@ -10,6 +10,7 @@ import {connect} from 'react-redux';
 import {StoreState} from '../types/store';
 import {store} from '../redux/store';
 
+import ReadFooter from '../components/readFooter';
 interface Props {
   name: string;
 }
@@ -20,7 +21,6 @@ const Read: React.FC<Props> = props => {
       let isExists = await RNFS.exists(path);
       if (!isExists) {
         RNFS.mkdir(path);
-        console.log('创建成功');
       }
     } catch (err) {
       console.log(err);
@@ -82,7 +82,6 @@ const Read: React.FC<Props> = props => {
   async function getChapterList(name: string) {
     let path = getPath(name) + '/a.txt';
     let data = await RNFS.readFile(path, 'utf8');
-    console.log(data);
   }
   const jsCode = `
     window.test = function(){
@@ -98,6 +97,7 @@ const Read: React.FC<Props> = props => {
   );
   const [msg, setMsg] = React.useState('');
   const [book, setBook] = React.useState();
+  const [footerIsOpen, setFooterIsOpen] = React.useState(true);
   const web = React.useRef<WebView>(null);
   return (
     <View>
@@ -112,6 +112,7 @@ const Read: React.FC<Props> = props => {
             // write(res[0], 'a', res[1], 'utf8');
             getChapterList(props.name);
             console.log(event.nativeEvent.data);
+            setMsg(event.nativeEvent.data);
             // addBookshelf(res[0]);
           }}
           onLoadEnd={() => {
@@ -119,7 +120,8 @@ const Read: React.FC<Props> = props => {
           }}
         />
       </View>
-      <Text>阅读</Text>
+      <Text height="93.5%">{msg}</Text>
+      <ReadFooter bookMsg={getBook(props.name)} isOpen={footerIsOpen} />
     </View>
   );
 };

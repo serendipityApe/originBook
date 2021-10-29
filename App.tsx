@@ -134,7 +134,11 @@ const App = () => {
                 options={{headerShown: false}}
                 component={Home}
               />
-              <Stack.Screen name="Details" component={ReadBook} />
+              <Stack.Screen
+                name="Details"
+                options={{headerShown: false}}
+                component={ReadBook}
+              />
             </Stack.Navigator>
           </PersistGate>
         </Provider>
