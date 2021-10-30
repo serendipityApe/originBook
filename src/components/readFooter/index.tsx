@@ -19,13 +19,20 @@ interface Props {
   isOpen: boolean;
   bookMsg: {};
 }
-import FooterChapter from './footer_chapter';
+import FooterChapter from '../../containers/footer_chapter';
 const ReadFooter: React.FC<Props> = props => {
   const [selected, setSelected] = React.useState(2);
   return (
     <Box
-      style={props.isOpen ? {display: 'flex'} : {display: 'none'}}
-      safeAreaBottom>
+      position="absolute"
+      bottom="0"
+      width="100%"
+      style={
+        props.isOpen
+          ? {display: 'flex'}
+          : {display: 'none', position: 'relative'}
+      }
+      height="6%">
       <HStack bg="white" alignItems="center">
         <Pressable
           opacity={selected === 0 ? 1 : 0.5}

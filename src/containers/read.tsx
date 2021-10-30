@@ -1,18 +1,23 @@
 import React from 'react';
-import {Text, View} from 'native-base';
+import {View, Box, Text, Pressable} from 'native-base';
+import {Dimensions, StatusBar} from 'react-native';
 import {WebView} from 'react-native-webview';
 import RNFS from 'react-native-fs';
 
 //引入action
-import {set_shelf} from '../redux/actions/bookshelf';
+import {set_shelf, edit_book} from '../redux/actions/bookshelf';
 //引入connect用于连接UI组件与redux
 import {connect} from 'react-redux';
 import {StoreState} from '../types/store';
 import {store} from '../redux/store';
 
+import Loading from '../components/loading';
 import ReadFooter from '../components/readFooter';
 interface Props {
   name: string;
+  chapterList: {}[];
+  set_shelf: Function;
+  edit_book: Function;
 }
 const Read: React.FC<Props> = props => {
   //目录不存在则添加目录
@@ -82,6 +87,9 @@ const Read: React.FC<Props> = props => {
   async function getChapterList(name: string) {
     let path = getPath(name) + '/a.txt';
     let data = await RNFS.readFile(path, 'utf8');
+    // console.log(data);
+    // setChapterList(JSON.parse(data));
+    return JSON.parse(data);
   }
   const jsCode = `
     window.test = function(){
@@ -92,13 +100,36 @@ const Read: React.FC<Props> = props => {
       window.ReactNativeWebView.postMessage(content.innerText);
     }
     `;
-  const [uri, setUri] = React.useState(
-    'https://www.ptwxz.com/html/8/8927/5821159.html',
-  );
+
+  //本章小说内容
   const [msg, setMsg] = React.useState('');
-  const [book, setBook] = React.useState();
+  const [book, setBook] = React.useState(getBook(props.name));
   const [footerIsOpen, setFooterIsOpen] = React.useState(true);
+  const [uri, setUri] = React.useState(props.chapterList[book.preChapter].uri);
+  const [loading, setLoading] = React.useState(true);
   const web = React.useRef<WebView>(null);
+  store.subscribe(() => {
+    setBook(getBook(props.name));
+    // console.log('变化' + getBook(props.name));
+  });
+
+  //func:当对应state更新时执行函数  listener:监听的state  ...args:func的参数
+  function useUpdateEffect(func: Function, listener: any[], ...args: any[]) {
+    let isInitialMount = React.useRef(true);
+    React.useEffect(() => {
+      if (isInitialMount.current) {
+        isInitialMount.current = false;
+      } else {
+        func.apply(undefined, args);
+      }
+    }, listener);
+  }
+  useUpdateEffect(() => {
+    setUri(props.chapterList[book.preChapter].uri);
+    setLoading(true);
+  }, [book]);
+  //设备宽度
+  const deviceW = Dimensions.get('window').width;
   return (
     <View>
       <View style={{height: 0, width: 0, display: 'none'}}>
@@ -108,27 +139,64 @@ const Read: React.FC<Props> = props => {
           source={{uri}}
           injectedJavaScript={jsCode}
           onMessage={event => {
-            // setMsg(event.nativeEvent.data);
-            // write(res[0], 'a', res[1], 'utf8');
-            getChapterList(props.name);
-            console.log(event.nativeEvent.data);
             setMsg(event.nativeEvent.data);
-            // addBookshelf(res[0]);
           }}
           onLoadEnd={() => {
+            console.log('阅读页面执行完毕');
+            setLoading(false);
             web && web.current!.injectJavaScript('window.test()');
           }}
         />
       </View>
-      <Text height="93.5%">{msg}</Text>
+      <Pressable
+        height="100%"
+        paddingX="5"
+        paddingTop="0"
+        // bg="red.100"
+        onPress={e => {
+          let x = e.nativeEvent.pageX;
+          if (x < deviceW * 0.3) {
+            console.log('left');
+            if (footerIsOpen) {
+              setFooterIsOpen(false);
+            }
+          } else if (x < deviceW && x > deviceW * 0.7) {
+            // props.edit_book({
+            //   name: props.name,
+            //   preChapter: book.preChapter + 1,
+            // });
+            if (footerIsOpen) {
+              setFooterIsOpen(false);
+            }
+          } else {
+            //console.log('center');
+            setFooterIsOpen(!footerIsOpen);
+          }
+        }}>
+        <Text fontSize="12" color="gray.600" paddingTop="2">
+          {props.chapterList[book.preChapter].name}
+        </Text>
+        <Text
+          paddingTop="0"
+          lineHeight={30}
+          letterSpacing="2xl"
+          numberOfLines={22}
+          ellipsizeMode="clip"
+          fontSize="20"
+          textAlign="justify"
+          height="96%">
+          {msg}
+        </Text>
+      </Pressable>
+      <Loading isOpen={loading} />
       <ReadFooter bookMsg={getBook(props.name)} isOpen={footerIsOpen} />
     </View>
   );
 };
 export default connect(
   (state: StoreState) => {
-    console.log(state);
+    // console.log(state);
     return {};
   },
-  {set_shelf},
+  {set_shelf, edit_book},
 )(Read);

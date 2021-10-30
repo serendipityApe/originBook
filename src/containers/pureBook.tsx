@@ -76,12 +76,13 @@ function PureBook(props: any) {
   const [name, setName] = React.useState('');
   const [purify, setPurify] = React.useState(false);
   const [showModal, setShowModal] = React.useState(false);
+  const [chapterList, setChapterList] = React.useState([]);
   const web = React.useRef<WebView>(null);
   return (
     <View>
       <View style={{height: '100%', width: '100%', overflow: 'hidden'}}>
         {purify ? (
-          <Read name={name} />
+          <Read chapterList={chapterList} name={name} />
         ) : (
           <WebView
             startInLoadingState={true}
@@ -93,6 +94,7 @@ function PureBook(props: any) {
               setName(res[0]);
               write(res[0], 'a', res[1], 'utf8');
               addBookshelf(res[0]);
+              setChapterList(JSON.parse(res[1]));
               setPurify(true);
             }}
             onLoadEnd={() => {
@@ -125,7 +127,7 @@ function PureBook(props: any) {
 }
 export default connect(
   (state: StoreState) => {
-    console.log(state);
+    // console.log(state);
     return {};
   },
   {set_shelf},

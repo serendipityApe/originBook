@@ -1,8 +1,13 @@
 import React from 'react';
-import {View, Text, Actionsheet, FlatList} from 'native-base';
+import {View, Actionsheet, FlatList, Text} from 'native-base';
 import RNFS from 'react-native-fs';
 // import {store} from '../redux/store';
-
+//引入action
+import {edit_book} from '../redux/actions/bookshelf';
+//引入connect用于连接UI组件与redux
+import {connect} from 'react-redux';
+import {StoreState} from '../types/store';
+import {store} from '../redux/store';
 interface Props {
   selected: number;
   setSelected: Function;
@@ -11,6 +16,7 @@ interface Props {
     preChapter: number;
     pUri: string;
   };
+  edit_book: Function;
 }
 const FooterChapter: React.FC<Props> = props => {
   const [chapterLsit, setChapterList] = React.useState([]);
@@ -22,11 +28,11 @@ const FooterChapter: React.FC<Props> = props => {
   async function getChapterList(name: string) {
     let path = getPath(name) + '/a.txt';
     let data = await RNFS.readFile(path, 'utf8');
-    console.log(data);
     setChapterList(JSON.parse(data));
   }
   React.useEffect(() => {
     getChapterList(props.bookMsg.name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <View>
@@ -40,8 +46,22 @@ const FooterChapter: React.FC<Props> = props => {
         <Actionsheet.Content>
           <FlatList
             data={chapterLsit}
-            renderItem={({item}) => (
-              <Actionsheet.Item>{item.name}</Actionsheet.Item>
+            renderItem={({item, index}) => (
+              <Text
+                minWidth="99%"
+                padding="4"
+                style={
+                  index === props.bookMsg.preChapter ? {color: '#60a5fa'} : {}
+                }
+                onPress={() => {
+                  props.edit_book({
+                    name: props.bookMsg.name,
+                    preChapter: index,
+                  });
+                  props.setSelected(4);
+                }}>
+                {item.name}
+              </Text>
             )}
             keyExtractor={item => item.uri}
           />
@@ -50,4 +70,10 @@ const FooterChapter: React.FC<Props> = props => {
     </View>
   );
 };
-export default FooterChapter;
+export default connect(
+  (state: StoreState) => {
+    console.log(state);
+    return {};
+  },
+  {edit_book},
+)(FooterChapter);

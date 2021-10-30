@@ -5,5 +5,16 @@ export interface StoreState extends Store {
 }
 
 export interface StoreBookshelf {
-  contents: {}[];
+  contents: {name: string; pUri: string; preChapter: number}[];
+}
+
+export interface setBookshelf {
+  name: string;
+  preChapter: number;
+  pUri: string;
+}
+export interface editBook {
+  name: string;
+  preChapter: number;
+  pUri?: string;
 }

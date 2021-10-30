@@ -3,3 +3,6 @@
 */
 export const SET_SHELF = 'set_shelf';
 export type SET_SHELF_t = typeof SET_SHELF;
+
+export const EDIT_BOOK = 'edit_book';
+export type EDIT_BOOK_t = typeof EDIT_BOOK;
