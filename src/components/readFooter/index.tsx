@@ -17,6 +17,7 @@ import {storeBookMsg} from '../../types/store';
 interface Props {
   isOpen: boolean;
   bookMsg: storeBookMsg;
+  chapterList: {name: string; uri: string}[]; //章节列表使用
   fontSize: [number, React.Dispatch<React.SetStateAction<number>>];
 }
 import FooterChapter from '../../containers/footer_chapter';
@@ -99,6 +100,7 @@ const ReadFooter: React.FC<Props> = props => {
         bookMsg={props.bookMsg}
         onClose={() => cancelTarget(0)}
         isOpen={selected.has(0)}
+        chapterList={props.chapterList}
       />
       <FooterFont
         fontSize={props.fontSize}

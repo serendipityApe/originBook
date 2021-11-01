@@ -9,7 +9,7 @@ import {StoreState} from '../types/store';
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  // whitelist: ['bookshelf'], //需要缓存的数据
+  whitelist: ['bookshelf'], //需要缓存的数据
   // blacklist: [], //不需要缓存的数据
 };
 // AsyncStorage.setItem('root', this.state.toggle)

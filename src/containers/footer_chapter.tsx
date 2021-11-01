@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Actionsheet, FlatList, Text} from 'native-base';
-import RNFS from 'react-native-fs';
+// import RNFS from 'react-native-fs';
 // import {store} from '../redux/store';
 //引入action
 import {edit_book} from '../redux/actions/bookshelf';
@@ -16,9 +16,12 @@ interface Props {
     pUri: string;
   };
   edit_book: Function;
+  chapterList: {name: string; uri: string}[];
 }
 const FooterChapter: React.FC<Props> = props => {
-  const [chapterLsit, setChapterList] = React.useState([]);
+  const [chapterLsit] = React.useState(props.chapterList);
+  /* 
+  //读取文件获取章节,现已改成props获取
   //根据名字获取书籍目录
   function getPath(name: string) {
     return RNFS.CachesDirectoryPath + '/myBook' + `/${name}`;
@@ -32,7 +35,7 @@ const FooterChapter: React.FC<Props> = props => {
   React.useEffect(() => {
     getChapterList(props.bookMsg.name);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); */
   return (
     <View>
       <Actionsheet
@@ -54,6 +57,17 @@ const FooterChapter: React.FC<Props> = props => {
                   index === props.bookMsg.preChapter ? {color: '#60a5fa'} : {}
                 }
                 onPress={() => {
+                  /* 
+                  //解决本章卡死
+                  if (index === props.bookMsg.preChapter) {
+                    props.onClose();
+                  } else {
+                    props.edit_book({
+                      name: props.bookMsg.name,
+                      preChapter: index,
+                    });
+                    props.onClose();
+                  } */
                   props.edit_book({
                     name: props.bookMsg.name,
                     preChapter: index,

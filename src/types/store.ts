@@ -15,7 +15,7 @@ export interface setBookshelf {
 }
 export interface editBook {
   name: string;
-  preChapter: number;
+  preChapter?: number;
   pUri?: string;
 }
 

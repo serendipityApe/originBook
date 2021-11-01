@@ -79,37 +79,6 @@ const Read: React.FC<Props> = props => {
     }
     return res;
   }
-  //目录不存在则添加目录
-  async function myMkdir(path: string) {
-    try {
-      let isExists = await RNFS.exists(path);
-      if (!isExists) {
-        RNFS.mkdir(path);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  //将解析后的书籍内容写入缓存
-  async function write(
-    LastDirectory: string,
-    name: string,
-    contents: string,
-    encoding: string,
-  ) {
-    try {
-      let path = RNFS.CachesDirectoryPath + '/myBook' + `/${LastDirectory}`;
-      await myMkdir(path);
-      path += `/${name}.txt`;
-      await RNFS.writeFile(path, contents, encoding);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  //根据名字获取书籍目录
-  function getPath(name: string) {
-    return RNFS.CachesDirectoryPath + '/myBook' + `/${name}`;
-  }
   //获取store里本书的信息
   function getBook(name: string) {
     let books = store.getState().bookshelf.contents;
@@ -292,6 +261,7 @@ const Read: React.FC<Props> = props => {
       </Pressable>
       <Loading isOpen={loading} />
       <ReadFooter
+        chapterList={props.chapterList}
         fontSize={[fontSize, setFontSize]}
         bookMsg={getBook(props.name)}
         isOpen={footerIsOpen}

@@ -12,11 +12,13 @@ import Read from './read';
 
 //@type
 import {storeBookMsg} from '../types/store';
+import {navigationProp} from '../types/navigate';
 interface Props {
   uri: string;
   edit_book: Function;
   set_shelf: Function;
   books: storeBookMsg[];
+  navigation: navigationProp;
 }
 const PureBook: React.FC<Props> = props => {
   async function myMkdir(path: string) {
@@ -47,6 +49,11 @@ const PureBook: React.FC<Props> = props => {
       console.log(err);
     }
   }
+  function checkUri(uri: string) {
+    var reg =
+      /^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/)(([A-Za-z0-9-~]+)\.)+([A-Za-z0-9-~\/])+$/;
+    return reg.test(uri);
+  }
   //解析目的地址传来的string
   function analysis(contents: string): string[] {
     let index = contents.indexOf('&');
@@ -59,6 +66,7 @@ const PureBook: React.FC<Props> = props => {
   function addBookshelf(name: string) {
     // let books = store.getState().bookshelf.contents;
     const {books} = props;
+    //flag为true则书不存在
     let flag = true;
     for (let item of books) {
       if (item.name === name) {
@@ -69,7 +77,7 @@ const PureBook: React.FC<Props> = props => {
     if (flag) {
       props.set_shelf({name, pUri: props.uri, preChapter: 0});
     } else {
-      props.edit_book({name, pUri: props.uri, preChapter: 0});
+      props.edit_book({name, pUri: props.uri});
     }
   }
   const jsCode = `
@@ -84,12 +92,33 @@ const PureBook: React.FC<Props> = props => {
     }
     `;
   // const [uri, setUri] = React.useState('https://www.ptwxz.com/html/8/8927/');
+  const [checkUriRes, setCheckUriRes] = React.useState(checkUri(props.uri));
   const [name, setName] = React.useState('');
   const [purify, setPurify] = React.useState(false);
   const [showModal, setShowModal] = React.useState(false);
   const [chapterList, setChapterList] = React.useState([]);
   const web = React.useRef<WebView>(null);
   const uri = props.uri;
+
+  useUpdateEffect(() => {
+    if (!checkUriRes && showModal === false) {
+      props.navigation.navigate('Home', {});
+    }
+  }, [showModal]);
+  useUpdateEffect(() => {
+    setPurify(true);
+  }, [chapterList]);
+
+  function useUpdateEffect(func: Function, listener: any[], ...args: any[]) {
+    let isInitialMount = React.useRef(true);
+    React.useEffect(() => {
+      if (isInitialMount.current) {
+        isInitialMount.current = false;
+      } else {
+        func.apply(undefined, args);
+      }
+    }, listener);
+  }
   return (
     <View>
       <View style={{height: '100%', width: '100%', overflow: 'hidden'}}>
@@ -107,7 +136,6 @@ const PureBook: React.FC<Props> = props => {
               write(res[0], 'a', res[1], 'utf8');
               addBookshelf(res[0]);
               setChapterList(JSON.parse(res[1]));
-              setPurify(true);
             }}
             onLoadEnd={() => {
               setShowModal(true);
@@ -120,14 +148,18 @@ const PureBook: React.FC<Props> = props => {
           <Modal.CloseButton />
           <Modal.Header>提示</Modal.Header>
           <Modal.Body>
-            <Text>检测到该网站支持净化阅读，是否净化</Text>
+            <Text>
+              {checkUriRes
+                ? '检测到该网站支持净化阅读，是否净化'
+                : '抱歉，未检测到网址，或该网站暂时不支持净化阅读'}
+            </Text>
           </Modal.Body>
           <Modal.Footer>
             <Button
               flex="1"
               onPress={() => {
-                web && web.current!.injectJavaScript('window.test()');
                 setShowModal(false);
+                web && web.current!.injectJavaScript('window.test()');
               }}>
               净化
             </Button>

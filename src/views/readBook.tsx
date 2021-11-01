@@ -8,8 +8,8 @@ interface Props {
   route: routeProp<'Details'>;
   navigation: navigationProp;
 }
-const ReadBook: React.FC<Props> = ({route}) => {
+const ReadBook: React.FC<Props> = ({route, navigation}) => {
   const {uri} = route.params;
-  return <PureBook uri={uri} />;
+  return <PureBook uri={uri} navigation={navigation} />;
 };
 export default ReadBook;

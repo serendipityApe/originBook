@@ -10,7 +10,9 @@ import {
   Flex,
   Button,
   useColorMode,
+  Modal,
 } from 'native-base';
+import Clipboard from '@react-native-clipboard/clipboard';
 
 import {store} from '../redux/store';
 import BlankBook from '../components/blankBook';
@@ -44,9 +46,16 @@ const Home: React.FC<Props> = ({navigation}) => {
   const [books, setBooks] = React.useState<storeBookMsg[]>(
     store.getState().bookshelf.contents,
   );
+  const [showModal, setShowModal] = React.useState(false);
   store.subscribe(() => {
     setBooks(store.getState().bookshelf.contents);
   });
+  const fetchCopiedText = async () => {
+    const text = await Clipboard.getString();
+    navigation.navigate('Details', {
+      uri: text,
+    });
+  };
   return (
     <Center
       _dark={{bg: 'blueGray.900'}}
@@ -81,14 +90,11 @@ const Home: React.FC<Props> = ({navigation}) => {
               />
             );
           })}
-          <BlankBook />
-          {/* <Button onPress={() => navigation.push('Details')}>go</Button> */}
-          <Button
+          <BlankBook
             onPress={() => {
-              console.log(store.getState().bookshelf);
-            }}>
-            store
-          </Button>
+              setShowModal(true);
+            }}
+          />
           <Box
             flexBasis="30%"
             flexShrink={0}
@@ -96,9 +102,43 @@ const Home: React.FC<Props> = ({navigation}) => {
             width="0"
             height="0"
           />
-          <ToggleDarkMode />
+          <Button
+            onPress={() => {
+              console.log(store.getState().bookshelf.contents);
+            }}>
+            store
+          </Button>
+          {/* <ToggleDarkMode /> */}
         </Flex>
       </ScrollView>
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <Modal.Content maxWidth="400px">
+          <Modal.CloseButton />
+          <Modal.Header>提示</Modal.Header>
+          <Modal.Body>
+            <Text>目前仅支持通过网址导入小说，此操作将调用您的粘贴板</Text>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button.Group space={2}>
+              <Button
+                variant="ghost"
+                colorScheme="blueGray"
+                onPress={() => {
+                  setShowModal(false);
+                }}>
+                取消
+              </Button>
+              <Button
+                onPress={() => {
+                  setShowModal(false);
+                  fetchCopiedText();
+                }}>
+                确认
+              </Button>
+            </Button.Group>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
     </Center>
   );
 };

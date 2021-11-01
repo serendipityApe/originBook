@@ -7,7 +7,9 @@ import {StoreBookshelf, setBookshelf} from '../../types/store';
 import {All} from '../actions/bookshelf';
 
 const initState: StoreBookshelf = {
-  contents: [{name: '默认', pUri: '', preChapter: 0}],
+  contents: [
+    {name: '重燃', pUri: 'https://www.ptwxz.com/html/8/8927/', preChapter: 0},
+  ],
 }; //初始化状态
 export default function bookshelfReducer(
   preState: StoreBookshelf = initState,
@@ -24,7 +26,11 @@ export default function bookshelfReducer(
     case EDIT_BOOK:
       let res = preState.contents.map(item => {
         if (item.name === data.name) {
-          return {...data, pUri: data.pUri ? data.pUri : item.pUri};
+          return {
+            ...data,
+            pUri: data.pUri ? data.pUri : item.pUri,
+            preChapter: data.preChapter ? data.preChapter : item.preChapter,
+          };
         }
         return item;
       });
