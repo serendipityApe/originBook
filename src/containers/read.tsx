@@ -151,7 +151,7 @@ const Read: React.FC<Props> = props => {
     lineHeight: 30,
   });
   //Text宽高
-  const [textXY, setTextXY] = React.useState<textXYState>({
+  const [textXY] = React.useState<textXYState>({
     width: 320,
     height: 723,
   });
