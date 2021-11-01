@@ -17,8 +17,10 @@ import {storeBookMsg} from '../../types/store';
 interface Props {
   isOpen: boolean;
   bookMsg: storeBookMsg;
+  fontSize: [number, React.Dispatch<React.SetStateAction<number>>];
 }
 import FooterChapter from '../../containers/footer_chapter';
+import FooterFont from './root_font';
 const ReadFooter: React.FC<Props> = props => {
   const {colorMode, toggleColorMode} = useColorMode();
   let initSet = colorMode === 'dark' ? new Set([1]) : new Set<number>();
@@ -97,6 +99,11 @@ const ReadFooter: React.FC<Props> = props => {
         bookMsg={props.bookMsg}
         onClose={() => cancelTarget(0)}
         isOpen={selected.has(0)}
+      />
+      <FooterFont
+        fontSize={props.fontSize}
+        isOpen={selected.has(2)}
+        onClose={() => cancelTarget(2)}
       />
     </Box>
   );

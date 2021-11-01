@@ -26,7 +26,7 @@ interface textXYState {
 }
 
 interface fontSizeState {
-  fontSize: string;
+  fontSize: number;
   numberOfLines: number;
   letterSpacing: number;
   lineHeight: number;
@@ -143,12 +143,14 @@ const Read: React.FC<Props> = props => {
   const [loading, setLoading] = React.useState(true);
   //当前页数
   const [curPage, setCurPage] = React.useState(0);
+  //fontSize
+  const [fontSize, setFontSize] = React.useState(20);
   //字体相关
   const [fontState, setFontState] = React.useState<fontSizeState>({
-    fontSize: '20',
-    numberOfLines: 22,
+    fontSize,
+    numberOfLines: 40,
     letterSpacing: 2,
-    lineHeight: 30,
+    lineHeight: fontSize + 10,
   });
   //Text宽高
   const [textXY] = React.useState<textXYState>({
@@ -183,17 +185,27 @@ const Read: React.FC<Props> = props => {
       }
     }, listener);
   }
+  //fontSize改变
+  useUpdateEffect(() => {
+    setFontState({
+      ...fontState,
+      fontSize,
+      lineHeight: fontSize + 10,
+    });
+  }, [fontSize]);
+  //book改变,这里用作监听章节变化
   useUpdateEffect(() => {
     setUri(props.chapterList[book.preChapter].uri);
     setLoading(true);
   }, [book]);
 
+  //本章内容改变或者字体改变，重新切割
   useUpdateEffect(() => {
     //切割完成
     setPageBook(splitBook(msg, textXY, fontState));
     setLoading(false);
     setCurPage(0);
-  }, [msg]);
+  }, [msg, fontState]);
   //设备宽度
   const deviceW = Dimensions.get('window').width;
   const text = React.useRef(null);
@@ -279,7 +291,11 @@ const Read: React.FC<Props> = props => {
         </Text>
       </Pressable>
       <Loading isOpen={loading} />
-      <ReadFooter bookMsg={getBook(props.name)} isOpen={footerIsOpen} />
+      <ReadFooter
+        fontSize={[fontSize, setFontSize]}
+        bookMsg={getBook(props.name)}
+        isOpen={footerIsOpen}
+      />
     </View>
   );
 };
