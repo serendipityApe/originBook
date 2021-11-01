@@ -1,16 +1,24 @@
 import React from 'react';
-import {Text, View, Modal, Button, Box} from 'native-base';
+import {Text, View, Modal, Button} from 'native-base';
 import {WebView} from 'react-native-webview';
 import RNFS from 'react-native-fs';
 
 //引入action
-import {set_shelf} from '../redux/actions/bookshelf';
+import {set_shelf, edit_book} from '../redux/actions/bookshelf';
 //引入connect用于连接UI组件与redux
 import {connect} from 'react-redux';
 import {StoreState} from '../types/store';
-import {store} from '../redux/store';
 import Read from './read';
-function PureBook(props: any) {
+
+//@type
+import {storeBookMsg} from '../types/store';
+interface Props {
+  uri: string;
+  edit_book: Function;
+  set_shelf: Function;
+  books: storeBookMsg[];
+}
+const PureBook: React.FC<Props> = props => {
   async function myMkdir(path: string) {
     try {
       let isExists = await RNFS.exists(path);
@@ -33,7 +41,7 @@ function PureBook(props: any) {
       let path = RNFS.CachesDirectoryPath + '/myBook' + `/${LastDirectory}`;
       await myMkdir(path);
       path += `/${name}.txt`;
-      let data = await RNFS.writeFile(path, contents, encoding);
+      await RNFS.writeFile(path, contents, encoding);
       console.log('path=' + path);
     } catch (err) {
       console.log(err);
@@ -47,9 +55,10 @@ function PureBook(props: any) {
     res.push(contents.slice(index + 1));
     return res;
   }
-  //将不存在的书加入书架
+  //将不存在的书加入书架或者更新已存在的书
   function addBookshelf(name: string) {
-    let books = store.getState().bookshelf.contents;
+    // let books = store.getState().bookshelf.contents;
+    const {books} = props;
     let flag = true;
     for (let item of books) {
       if (item.name === name) {
@@ -58,7 +67,9 @@ function PureBook(props: any) {
       }
     }
     if (flag) {
-      props.set_shelf({name, pUri: '', preChapter: 0});
+      props.set_shelf({name, pUri: props.uri, preChapter: 0});
+    } else {
+      props.edit_book({name, pUri: props.uri, preChapter: 0});
     }
   }
   const jsCode = `
@@ -72,12 +83,13 @@ function PureBook(props: any) {
       window.ReactNativeWebView.postMessage(bookName + '&' +JSON.stringify(chaperlist));
     }
     `;
-  const [uri, setUri] = React.useState('https://www.ptwxz.com/html/8/8927/');
+  // const [uri, setUri] = React.useState('https://www.ptwxz.com/html/8/8927/');
   const [name, setName] = React.useState('');
   const [purify, setPurify] = React.useState(false);
   const [showModal, setShowModal] = React.useState(false);
   const [chapterList, setChapterList] = React.useState([]);
   const web = React.useRef<WebView>(null);
+  const uri = props.uri;
   return (
     <View>
       <View style={{height: '100%', width: '100%', overflow: 'hidden'}}>
@@ -124,11 +136,13 @@ function PureBook(props: any) {
       </Modal>
     </View>
   );
-}
+};
 export default connect(
   (state: StoreState) => {
     // console.log(state);
-    return {};
+    return {
+      books: state.bookshelf.contents,
+    };
   },
-  {set_shelf},
+  {set_shelf, edit_book},
 )(PureBook);

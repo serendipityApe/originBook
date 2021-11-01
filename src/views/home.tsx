@@ -1,23 +1,49 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
 import React from 'react';
-import {Center, StatusBar, Box, ScrollView, Flex, Button} from 'native-base';
+import {
+  Center,
+  Switch,
+  Text,
+  HStack,
+  StatusBar,
+  Box,
+  ScrollView,
+  Flex,
+  Button,
+  useColorMode,
+} from 'native-base';
 
 import {store} from '../redux/store';
 import BlankBook from '../components/blankBook';
 import Search from '../components/search';
 import Book from '../components/book';
-function Home({navigation}) {
-  // const books = store.getState().bookshelf.contents;
-  const [books, setBooks] = React.useState(store.getState().bookshelf.contents);
+
+//type
+import {navigationProp} from '../types/navigate';
+import {storeBookMsg} from '../types/store';
+interface Props {
+  navigation: navigationProp;
+}
+
+function ToggleDarkMode() {
+  const {colorMode, toggleColorMode} = useColorMode();
+  return (
+    <HStack space={2} alignItems="center">
+      <Text>Dark</Text>
+      <Switch
+        isChecked={colorMode === 'light' ? true : false}
+        onToggle={toggleColorMode}
+        aria-label={
+          colorMode === 'light' ? 'switch to dark mode' : 'switch to light mode'
+        }
+      />
+      <Text>Light</Text>
+    </HStack>
+  );
+}
+const Home: React.FC<Props> = ({navigation}) => {
+  const [books, setBooks] = React.useState<storeBookMsg[]>(
+    store.getState().bookshelf.contents,
+  );
   store.subscribe(() => {
     setBooks(store.getState().bookshelf.contents);
   });
@@ -47,15 +73,16 @@ function Home({navigation}) {
                 name={element.name}
                 key={element.name}
                 pUri={element.pUri}
+                onPress={(uri: string) => {
+                  navigation.navigate('Details', {
+                    uri,
+                  });
+                }}
               />
             );
           })}
-          <Book name="test" pUri="" />
-          <Book name="test" pUri="" />
-          <Book name="test" pUri="" />
-          <Book name="test" pUri="" />
           <BlankBook />
-          <Button onPress={() => navigation.push('Details')}>go</Button>
+          {/* <Button onPress={() => navigation.push('Details')}>go</Button> */}
           <Button
             onPress={() => {
               console.log(store.getState().bookshelf);
@@ -64,16 +91,16 @@ function Home({navigation}) {
           </Button>
           <Box
             flexBasis="30%"
-            flexShrink="0"
-            flexGrow="0"
+            flexShrink={0}
+            flexGrow={0}
             width="0"
             height="0"
           />
-          {/* <ToggleDarkMode /> */}
+          <ToggleDarkMode />
         </Flex>
       </ScrollView>
     </Center>
   );
-}
+};
 
 export default Home;

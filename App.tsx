@@ -16,6 +16,7 @@ import {store, persistor} from './src/redux/store';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
+import {stackParamsList} from './src/types/navigate';
 import {
   Text,
   HStack,
@@ -38,12 +39,8 @@ import {
   Button,
 } from 'native-base';
 import {PermissionsAndroid} from 'react-native';
-import {WebView} from 'react-native-webview';
 
 import Home from './src/views/home';
-import BlankBook from './src/components/blankBook';
-import Search from './src/components/search';
-import Book from './src/components/book';
 import ReadBook from './src/views/readBook';
 // Color Switch Component
 function ToggleDarkMode() {
@@ -62,7 +59,7 @@ function ToggleDarkMode() {
     </HStack>
   );
 }
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<stackParamsList>();
 
 const App = () => {
   async function permissions() {

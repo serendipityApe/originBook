@@ -7,10 +7,9 @@ import {edit_book} from '../redux/actions/bookshelf';
 //引入connect用于连接UI组件与redux
 import {connect} from 'react-redux';
 import {StoreState} from '../types/store';
-import {store} from '../redux/store';
 interface Props {
-  selected: number;
-  setSelected: Function;
+  isOpen: boolean;
+  onClose: Function;
   bookMsg: {
     name: string;
     preChapter: number;
@@ -40,14 +39,15 @@ const FooterChapter: React.FC<Props> = props => {
         // disableOverlay
         hideDragIndicator
         onClose={() => {
-          props.setSelected(4);
+          props.onClose();
         }}
-        isOpen={props.selected === 0}>
+        isOpen={props.isOpen}>
         <Actionsheet.Content>
           <FlatList
             data={chapterLsit}
             renderItem={({item, index}) => (
               <Text
+                _dark={{color: 'muted.400'}}
                 minWidth="99%"
                 padding="4"
                 style={
@@ -58,7 +58,7 @@ const FooterChapter: React.FC<Props> = props => {
                     name: props.bookMsg.name,
                     preChapter: index,
                   });
-                  props.setSelected(4);
+                  props.onClose();
                 }}>
                 {item.name}
               </Text>

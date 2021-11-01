@@ -18,3 +18,9 @@ export interface editBook {
   preChapter: number;
   pUri?: string;
 }
+
+export type storeBookMsg = {
+  name: string;
+  preChapter: number;
+  pUri: string;
+};
