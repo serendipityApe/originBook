@@ -1,9 +1,7 @@
 import React from 'react';
 import {View, Box, Text, Pressable} from 'native-base';
-import {Dimensions, StatusBar, UIManager, findNodeHandle} from 'react-native';
+import {Dimensions, StatusBar, StatusBarManager, Platform} from 'react-native';
 import {WebView} from 'react-native-webview';
-import RNFS from 'react-native-fs';
-
 //引入action
 import {set_shelf, edit_book} from '../redux/actions/bookshelf';
 //引入connect用于连接UI组件与redux
@@ -176,8 +174,16 @@ const Read: React.FC<Props> = props => {
   //设备宽度
   const deviceW = Dimensions.get('window').width;
   const text = React.useRef(null);
+  let statusBarHeight;
+  if (Platform.OS === 'ios') {
+    StatusBarManager.getHeight((height: number) => {
+      statusBarHeight = height;
+    });
+  } else {
+    statusBarHeight = StatusBar.currentHeight;
+  }
   return (
-    <View>
+    <View _dark={{background: 'dark.100'}}>
       <View style={{height: 0, width: 0, display: 'none'}}>
         <WebView
           startInLoadingState={true}
@@ -201,12 +207,20 @@ const Read: React.FC<Props> = props => {
           }}
         />
       </View>
+      <StatusBar
+        // animated={true}
+        translucent={true}
+        barStyle="dark-content"
+        // hidden={true}
+        backgroundColor={'transparent'}
+      />
       <Pressable
+        position="relative"
+        top={statusBarHeight}
         height="100%"
         paddingX="5"
         paddingTop="0"
         // bg="red.100"
-        _dark={{background: 'dark.100'}}
         onPress={e => {
           let x = e.nativeEvent.pageX;
           if (x < deviceW * 0.3) {

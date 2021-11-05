@@ -8,7 +8,7 @@ const search = () => {
       variant="rounded"
       overflow="visible"
       position="absolute"
-      top="2"
+      top="8"
       w={{
         base: '96%',
         md: '25%',

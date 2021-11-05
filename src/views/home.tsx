@@ -58,18 +58,19 @@ const Home: React.FC<Props> = ({navigation}) => {
   };
   return (
     <Center
+      paddingTop={6}
       _dark={{bg: 'blueGray.900'}}
       _light={{bg: 'blueGray.50'}}
       px={4}
       flex={1}>
       <StatusBar
         animated={true}
-        // translucent={true}
+        translucent={true}
         barStyle="dark-content"
-        backgroundColor={'#f8fafc'}
+        backgroundColor={'transparent'}
       />
       <Search />
-      <ScrollView position="relative" maxHeight="80%">
+      <ScrollView position="relative" top={2} maxHeight="80%">
         <Flex
           direction="row"
           flexWrap="wrap"
