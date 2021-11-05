@@ -36,6 +36,7 @@ const FooterChapter: React.FC<Props> = props => {
     getChapterList(props.bookMsg.name);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); */
+  const preChapter = props.bookMsg.preChapter;
   return (
     <View>
       <Actionsheet
@@ -48,18 +49,22 @@ const FooterChapter: React.FC<Props> = props => {
         <Actionsheet.Content>
           <FlatList
             data={chapterLsit}
+            //flatList优化
+            getItemLayout={(data, index: number) => ({
+              length: 53,
+              offset: 53 * index,
+              index,
+            })}
+            initialScrollIndex={preChapter}
             renderItem={({item, index}) => (
               <Text
                 _dark={{color: 'muted.400'}}
                 minWidth="99%"
                 padding="4"
-                style={
-                  index === props.bookMsg.preChapter ? {color: '#60a5fa'} : {}
-                }
+                style={index === preChapter ? {color: '#60a5fa'} : {}}
                 onPress={() => {
-                  /*
                   //解决本章卡死
-                  if (index === props.bookMsg.preChapter) {
+                  if (index === preChapter) {
                     props.onClose();
                   } else {
                     props.edit_book({
@@ -67,12 +72,7 @@ const FooterChapter: React.FC<Props> = props => {
                       preChapter: index,
                     });
                     props.onClose();
-                  } */
-                  props.edit_book({
-                    name: props.bookMsg.name,
-                    preChapter: index,
-                  });
-                  props.onClose();
+                  }
                 }}>
                 {item.name}
               </Text>

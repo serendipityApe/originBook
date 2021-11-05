@@ -29,7 +29,10 @@ export default function bookshelfReducer(
           return {
             ...data,
             pUri: data.pUri ? data.pUri : item.pUri,
-            preChapter: data.preChapter ? data.preChapter : item.preChapter,
+            preChapter:
+              data.preChapter !== undefined && data.preChapter >= 0
+                ? data.preChapter
+                : item.preChapter,
           };
         }
         return item;

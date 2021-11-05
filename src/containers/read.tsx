@@ -57,7 +57,7 @@ const Read: React.FC<Props> = props => {
     let res = [];
     for (let element of arr) {
       let prePageLines = pageLines;
-      //首行空两位，但实际上占了4个length，所有反而要-2
+      //首行空两位，但实际上占了4个length，所以反而要-2
       pageLines += Math.ceil((element.length - 2) / lineNumber) + 1;
       if (pageLines < lines) {
         page += element + '\n\n';
@@ -109,17 +109,17 @@ const Read: React.FC<Props> = props => {
   const [curPage, setCurPage] = React.useState(0);
   //fontSize
   const [fontSize, setFontSize] = React.useState(20);
+  //Text宽高
+  const [textXY, setTextXY] = React.useState<textXYState>({
+    width: 0,
+    height: 0,
+  });
   //字体相关
   const [fontState, setFontState] = React.useState<fontSizeState>({
     fontSize,
     numberOfLines: 40,
     letterSpacing: 2,
     lineHeight: fontSize + 10,
-  });
-  //Text宽高
-  const [textXY, setTextXY] = React.useState<textXYState>({
-    width: 0,
-    height: 0,
   });
   const web = React.useRef<WebView>(null);
   store.subscribe(() => {
@@ -217,7 +217,7 @@ const Read: React.FC<Props> = props => {
       <Pressable
         position="relative"
         top={statusBarHeight}
-        height="100%"
+        // height="100%"
         paddingX="5"
         paddingTop="0"
         // bg="red.100"
@@ -278,7 +278,7 @@ const Read: React.FC<Props> = props => {
           fontSize="14"
           color="gray.600"
           position="absolute"
-          bottom={5}
+          bottom={8}
           right={8}>
           {curPage + 1}/{pageBook.length}
         </Text>
