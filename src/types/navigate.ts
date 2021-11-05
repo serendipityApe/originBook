@@ -7,6 +7,9 @@ export type stackParamsList = {
     uri: string;
   };
   Home: {};
+  JustWeb: {
+    uri: string;
+  };
 };
 
 export type navigationProp = StackNavigationProp<stackParamsList>;

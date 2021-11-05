@@ -20,7 +20,7 @@ interface Props {
 }
 const FooterChapter: React.FC<Props> = props => {
   const [chapterLsit] = React.useState(props.chapterList);
-  /* 
+  /*
   //读取文件获取章节,现已改成props获取
   //根据名字获取书籍目录
   function getPath(name: string) {
@@ -57,7 +57,7 @@ const FooterChapter: React.FC<Props> = props => {
                   index === props.bookMsg.preChapter ? {color: '#60a5fa'} : {}
                 }
                 onPress={() => {
-                  /* 
+                  /*
                   //解决本章卡死
                   if (index === props.bookMsg.preChapter) {
                     props.onClose();

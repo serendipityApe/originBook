@@ -102,12 +102,12 @@ const Home: React.FC<Props> = ({navigation}) => {
             width="0"
             height="0"
           />
-          <Button
+          {/* <Button
             onPress={() => {
               console.log(store.getState().bookshelf.contents);
             }}>
             store
-          </Button>
+          </Button> */}
           {/* <ToggleDarkMode /> */}
         </Flex>
       </ScrollView>

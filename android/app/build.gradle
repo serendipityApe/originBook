@@ -146,6 +146,14 @@ android {
         }
     }
     signingConfigs {
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
+        }
         debug {
             storeFile file('debug.keystore')
             storePassword 'android'
@@ -163,6 +171,7 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
         }
     }
 
@@ -184,6 +193,13 @@ android {
 }
 
 dependencies {
+    //尝试解决闪退问题
+    // def useIntlJsc = false
+    // if (useIntlJsc) {
+    //     implementation 'org.webkit:android-jsc-intl:+'
+    // } else {
+    //     implementation 'org.webkit:android-jsc:+'
+
     // react-native-fs配置
     // implementation project(':react-native-fs')
     implementation fileTree(dir: "libs", include: ["*.jar"])

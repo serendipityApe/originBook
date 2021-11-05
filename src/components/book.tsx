@@ -5,6 +5,7 @@ interface Props {
   pUri: string;
   onPress: Function;
 }
+// https://images.pexels.com/photos/8060219/pexels-photo-8060219.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940
 const Book: React.FC<Props> = props => {
   return (
     <Pressable
@@ -20,7 +21,7 @@ const Book: React.FC<Props> = props => {
         <Box>
           <Image
             source={{
-              uri: 'https://wallpaperaccess.com/full/317501.jpg',
+              uri: 'https://images.pexels.com/photos/3007370/pexels-photo-3007370.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
             }}
             alt="Alternate Text"
             size="xl"

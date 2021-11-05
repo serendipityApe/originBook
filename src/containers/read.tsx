@@ -11,6 +11,8 @@ import {connect} from 'react-redux';
 import {StoreState} from '../types/store';
 import {store} from '../redux/store';
 
+import {getContentCode} from '../utils/grab';
+
 import Loading from '../components/loading';
 import ReadFooter from '../components/readFooter';
 
@@ -32,6 +34,10 @@ interface fontSizeState {
   lineHeight: number;
 }
 const Read: React.FC<Props> = props => {
+  //切割网址
+  function splitUri(uri: string) {
+    return uri.split('/')[2];
+  }
   //切割分页内容
   function splitBook(
     msg: string,
@@ -88,15 +94,6 @@ const Read: React.FC<Props> = props => {
       }
     }
   }
-  const jsCode = `
-    window.test = function(){
-      let content=document.querySelector('#content');
-      while(content.firstElementChild.nodeName != 'BR'){
-        content.removeChild(content.firstElementChild)
-        }
-      window.ReactNativeWebView.postMessage(content.innerText);
-    }
-    `;
 
   //本章小说内容
   const [msg, setMsg] = React.useState('');
@@ -122,15 +119,16 @@ const Read: React.FC<Props> = props => {
     lineHeight: fontSize + 10,
   });
   //Text宽高
-  const [textXY] = React.useState<textXYState>({
-    width: 320,
-    height: 723,
+  const [textXY, setTextXY] = React.useState<textXYState>({
+    width: 0,
+    height: 0,
   });
   const web = React.useRef<WebView>(null);
   store.subscribe(() => {
     setBook(getBook(props.name));
     // console.log('变化' + getBook(props.name));
   });
+  const jsCode = getContentCode(splitUri(uri));
   // React.useEffect(() => {
   //   const handle = findNodeHandle(text.current);
   //   UIManager.measure(handle, (x, y, width, height, pageX, pageY) => {
@@ -154,7 +152,7 @@ const Read: React.FC<Props> = props => {
       }
     }, listener);
   }
-  //fontSize改变
+  //fontSize改变,setFontState
   useUpdateEffect(() => {
     setFontState({
       ...fontState,
@@ -184,8 +182,15 @@ const Read: React.FC<Props> = props => {
         <WebView
           startInLoadingState={true}
           ref={web}
-          source={{uri}}
-          injectedJavaScript={jsCode}
+          source={{
+            uri,
+            headers: {
+              userAgent:
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36',
+            },
+          }}
+          userAgent="Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36"
+          injectedJavaScript={jsCode ? jsCode : ''}
           onMessage={event => {
             // console.log(event.nativeEvent.data);
             setMsg(event.nativeEvent.data);
@@ -240,6 +245,11 @@ const Read: React.FC<Props> = props => {
         <Text
           _dark={{color: 'muted.500'}}
           ref={text}
+          onLayout={event => {
+            let msg = event.nativeEvent.layout;
+            // console.log(event.nativeEvent.layout);
+            setTextXY({width: msg.width, height: msg.height});
+          }}
           paddingTop="0"
           lineHeight={fontState.lineHeight}
           letterSpacing={fontState.letterSpacing}

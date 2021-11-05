@@ -10,7 +10,7 @@ import {
   Center,
   NativeBaseProvider,
 } from 'native-base';
-import {PermissionsAndroid} from 'react-native';
+import {PermissionsAndroid, Linking} from 'react-native';
 
 export function Example() {
   //获取权限
@@ -71,6 +71,17 @@ export function Example() {
       console.log('' + e);
     }
   }
+  function openUriInBrowser(url: string) {
+    Linking.canOpenURL(url)
+      .then(supported => {
+        if (!supported) {
+          console.warn("Can't handle url: " + url);
+        } else {
+          return Linking.openURL(url);
+        }
+      })
+      .catch(err => console.error('An error occurred', url));
+  }
   return (
     <Box position="relative" left="10">
       <Menu
@@ -92,8 +103,15 @@ export function Example() {
         </Menu.Group>
         <Divider mt="3" w="100%" />
         <Menu.Group title="系统设置">
-          <Menu.Item>SF Pro</Menu.Item>
-          <Menu.Item>Helvetica</Menu.Item>
+          <Menu.Item>深色模式开发中...</Menu.Item>
+          <Menu.Item
+            onPress={() => {
+              openUriInBrowser(
+                'https://www.wolai.com/54qV2w21C6nELHSFCKtFPq?theme=light',
+              );
+            }}>
+            关于originBook
+          </Menu.Item>
         </Menu.Group>
       </Menu>
     </Box>

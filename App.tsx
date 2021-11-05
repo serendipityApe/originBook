@@ -10,7 +10,6 @@
 
 import React from 'react';
 import {Provider} from 'react-redux';
-import {persistStore} from 'redux-persist';
 import {PersistGate} from 'redux-persist/es/integration/react';
 import {store, persistor} from './src/redux/store';
 import {NavigationContainer} from '@react-navigation/native';
@@ -20,28 +19,15 @@ import {stackParamsList} from './src/types/navigate';
 import {
   Text,
   HStack,
-  Center,
-  Heading,
-  StatusBar,
-  Box,
-  View,
-  // Stack,
-  ScrollView,
   Switch,
   useColorMode,
   NativeBaseProvider,
-  VStack,
-  Hidden,
-  Modal,
-  Flex,
-  Code,
-  AddIcon,
-  Button,
 } from 'native-base';
 import {PermissionsAndroid} from 'react-native';
 
 import Home from './src/views/home';
 import ReadBook from './src/views/readBook';
+import JustWeb from './src/views/justWeb';
 // Color Switch Component
 function ToggleDarkMode() {
   const {colorMode, toggleColorMode} = useColorMode();
@@ -118,7 +104,9 @@ const App = () => {
       console.log(err.toString());
     }
   }
-  // React.useEffect(() => {});
+  React.useEffect(() => {
+    permissions();
+  });
   return (
     <NavigationContainer>
       <NativeBaseProvider>
@@ -135,6 +123,11 @@ const App = () => {
                 name="Details"
                 options={{headerShown: false}}
                 component={ReadBook}
+              />
+              <Stack.Screen
+                name="JustWeb"
+                options={{headerShown: false}}
+                component={JustWeb}
               />
             </Stack.Navigator>
           </PersistGate>

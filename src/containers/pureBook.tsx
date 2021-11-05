@@ -1,5 +1,6 @@
 import React from 'react';
 import {Text, View, Modal, Button} from 'native-base';
+import {Linking} from 'react-native';
 import {WebView} from 'react-native-webview';
 import RNFS from 'react-native-fs';
 
@@ -9,7 +10,7 @@ import {set_shelf, edit_book} from '../redux/actions/bookshelf';
 import {connect} from 'react-redux';
 import {StoreState} from '../types/store';
 import Read from './read';
-
+import {getChapterCode} from '../utils/grab';
 //@type
 import {storeBookMsg} from '../types/store';
 import {navigationProp} from '../types/navigate';
@@ -21,6 +22,10 @@ interface Props {
   navigation: navigationProp;
 }
 const PureBook: React.FC<Props> = props => {
+  //切割网址
+  function splitUri(uri: string) {
+    return uri.split('/')[2];
+  }
   async function myMkdir(path: string) {
     try {
       let isExists = await RNFS.exists(path);
@@ -52,7 +57,7 @@ const PureBook: React.FC<Props> = props => {
   function checkUri(uri: string) {
     var reg =
       /^([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/)(([A-Za-z0-9-~]+)\.)+([A-Za-z0-9-~\/])+$/;
-    return reg.test(uri);
+    return reg.test(uri) && getChapterCode(splitUri(uri));
   }
   //解析目的地址传来的string
   function analysis(contents: string): string[] {
@@ -80,19 +85,9 @@ const PureBook: React.FC<Props> = props => {
       props.edit_book({name, pUri: props.uri});
     }
   }
-  const jsCode = `
-    window.test = function(){
-      let lists=document.querySelectorAll('.centent li a');
-      var chaperlist=[];
-      var bookName=document.querySelector('.title h1').innerHTML.replace('最新章节','');
-      for(let i=0;i<lists.length;i++){
-        chaperlist.push({name:lists[i].innerHTML,uri:lists[i].href});
-      }
-      window.ReactNativeWebView.postMessage(bookName + '&' +JSON.stringify(chaperlist));
-    }
-    `;
+  const jsCode = getChapterCode(splitUri(props.uri));
   // const [uri, setUri] = React.useState('https://www.ptwxz.com/html/8/8927/');
-  const [checkUriRes, setCheckUriRes] = React.useState(checkUri(props.uri));
+  const [checkUriRes] = React.useState(checkUri(props.uri));
   const [name, setName] = React.useState('');
   const [purify, setPurify] = React.useState(false);
   const [showModal, setShowModal] = React.useState(false);
@@ -129,7 +124,7 @@ const PureBook: React.FC<Props> = props => {
             startInLoadingState={true}
             ref={web}
             source={{uri}}
-            injectedJavaScript={jsCode}
+            injectedJavaScript={jsCode ? jsCode : ''}
             onMessage={event => {
               let res = analysis(event.nativeEvent.data);
               setName(res[0]);
@@ -158,10 +153,27 @@ const PureBook: React.FC<Props> = props => {
             <Button
               flex="1"
               onPress={() => {
-                setShowModal(false);
-                web && web.current!.injectJavaScript('window.test()');
+                if (checkUriRes) {
+                  setShowModal(false);
+                  web && web.current!.injectJavaScript('window.test()');
+                } else {
+                  // props.navigation.navigate('JustWeb', {
+                  //   uri: 'https://www.wolai.com/chU6iMXUSPtvtZz3EcKsGt',
+                  // });
+                  let url = 'https://www.wolai.com/chU6iMXUSPtvtZz3EcKsGt';
+                  Linking.canOpenURL(url)
+                    .then(supported => {
+                      if (!supported) {
+                        console.warn("Can't handle url: " + url);
+                      } else {
+                        return Linking.openURL(url);
+                      }
+                    })
+                    .catch(err => console.error('An error occurred', url));
+                  setShowModal(false);
+                }
               }}>
-              净化
+              {checkUriRes ? '净化' : '链接导入说明'}
             </Button>
           </Modal.Footer>
         </Modal.Content>
