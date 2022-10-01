@@ -217,7 +217,7 @@ const Read: React.FC<Props> = props => {
       <Pressable
         position="relative"
         top={statusBarHeight}
-        // height="100%"
+        height="100%"
         paddingX="5"
         paddingTop="0"
         // bg="red.100"
@@ -278,7 +278,7 @@ const Read: React.FC<Props> = props => {
           fontSize="14"
           color="gray.600"
           position="absolute"
-          bottom={8}
+          bottom={10}
           right={8}>
           {curPage + 1}/{pageBook.length}
         </Text>
@@ -295,7 +295,7 @@ const Read: React.FC<Props> = props => {
 };
 export default connect(
   (state: StoreState) => {
-    // console.log(state);
+    console.log(state);
     return {};
   },
   {set_shelf, edit_book},

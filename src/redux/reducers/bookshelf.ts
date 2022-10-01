@@ -8,7 +8,12 @@ import {All} from '../actions/bookshelf';
 
 const initState: StoreBookshelf = {
   contents: [
-    {name: '重燃', pUri: 'https://www.ptwxz.com/html/8/8927/', preChapter: 0},
+    {name: '重燃', pUri: 'https://www.dduxs.com/read/1098/', preChapter: 0},
+    {
+      name: '夜的命名术',
+      pUri: 'https://www.dduxs.com/read/203491/',
+      preChapter: 0,
+    },
   ],
 }; //初始化状态
 export default function bookshelfReducer(
